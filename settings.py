@@ -1,0 +1,20 @@
+# The playfield is a 10 by 22 grid of blocks
+GRID_HEIGHT = 22
+GRID_WIDTH = 10
+
+# A tetromino is composed of blocks, each block is 10px by 10 px
+BLOCK_WIDTH = 30
+BLOCK_HEIGHT = BLOCK_WIDTH
+
+# Pygame window sizes
+SCREEN_HEIGHT = BLOCK_HEIGHT * GRID_HEIGHT
+SCREEN_WIDTH = BLOCK_WIDTH * GRID_WIDTH
+
+# COLORS
+RED = "RED"
+GREEN = "GREEN"
+BLUE = "BLUE"
+PURPLE = "PURPLE"
+ORANGE = "ORANGE"
+TURQUOISE = "TURQUOISE"
+YELLOW = "YELLOW"
