@@ -143,7 +143,13 @@ class Tetris:
         LINES_TEXT = FONT_MAIN.render(f"LINES: {self.lines}", True, (255, 255, 255))
         self.screen.blit(SCORE_TEXT, (SCREEN_WIDTH + 10, 10))
         self.screen.blit(LINES_TEXT, (SCREEN_WIDTH + 10, 40))
-        self.screen.blit(TETRIS_TEXT, (SCREEN_WIDTH + 150 - TETRIS_TEXT.get_width() // 2, SCREEN_HEIGHT - TETRIS_TEXT.get_height() - 10))
+        self.screen.blit(
+            TETRIS_TEXT,
+            (
+                SCREEN_WIDTH + 150 - TETRIS_TEXT.get_width() // 2,
+                SCREEN_HEIGHT - TETRIS_TEXT.get_height() - 10,
+            ),
+        )
         self.screen.blit(SCORE_TEXT, (SCREEN_WIDTH + 10, 10))
         self.screen.blit(LINES_TEXT, (SCREEN_WIDTH + 10, 40))
         self.screen.blit(CONTROLS_UP, (SCREEN_WIDTH + 10, 100))
@@ -151,7 +157,6 @@ class Tetris:
         self.screen.blit(CONTROLS_RIGHT, (SCREEN_WIDTH + 10, 160))
         self.screen.blit(CONTROLS_SPACE, (SCREEN_WIDTH + 10, 190))
         self.screen.blit(CONTROLS_C, (SCREEN_WIDTH + 10, 220))
-        
 
     def _draw_playfield(self):
         # Background

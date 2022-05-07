@@ -1,5 +1,5 @@
 # The playfield is a 10 by 22 grid of blocks
-from pygame import USEREVENT, image, mixer, font
+from pygame import USEREVENT, font, image, mixer
 
 # Event triggers every 500 ms
 STEP = USEREVENT
