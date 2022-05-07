@@ -1,5 +1,4 @@
 from random import choice
-from unittest import case
 
 import pygame
 
@@ -12,8 +11,9 @@ STEP = pygame.USEREVENT
 class Tetris:
     def __init__(self):
         pygame.init()
+        self.font = pygame.font.SysFont("monospace", 40)
         pygame.time.set_timer(STEP, 500)
-        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        self.screen = pygame.display.set_mode((SCREEN_WIDTH + 300, SCREEN_HEIGHT))
         self.BLOCKS = {
             "I": pygame.image.load("./assets/tiles/tile_red.png"),
             "O": pygame.image.load("./assets/tiles/tile_green.png"),
@@ -25,11 +25,18 @@ class Tetris:
             0: pygame.image.load("./assets/tiles/tile_empty.png"),
         }
         self.grid = [[0] * GRID_WIDTH for _ in range(GRID_HEIGHT)]
-        self.tetrominos = [I(), O(), T(), S(), Z(), J(), L()]
-        self.tetromino = choice(self.tetrominos)
+        self.score = 0
+
+    def display_score(self):
+        pygame.draw.rect(self.screen, (0, 0, 0), (SCREEN_WIDTH, 0, 300, SCREEN_HEIGHT))
+        text = self.font.render(f"Score:", True, (255, 255, 255))
+        self.screen.blit(text, (SCREEN_WIDTH + 20, 10))
+        scr = self.font.render(f"{self.score}", True, (255, 255, 255))
+        self.screen.blit(scr, (SCREEN_WIDTH + 200, 12))
 
     def run(self):
 
+        self.spawn_tetromino()
 
         # GAME LOOP
         running = True
@@ -40,35 +47,98 @@ class Tetris:
                     pygame.quit()
                     exit(0)
                 elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_UP:
-                        self.tetromino.rotate()
-                    elif event.key == pygame.K_DOWN:
-                        self.tetromino.y += 1
-                    elif event.key == pygame.K_LEFT:
-                        self.tetromino.x -= 1
-                    elif event.key == pygame.K_RIGHT:
-                        self.tetromino.x += 1
-                    elif event.key == pygame.K_SPACE:
-                        self.tetromino.drop()
-                    else:
-                        pass
+                    if self.tetromino:
+                        if event.key == pygame.K_UP:
+                            self.tetromino.rotate()
+                            if self.collision():
+                                self.tetromino.rotate(True)
+                        elif event.key == pygame.K_DOWN:
+                            self.tetromino.y += 1
+                            if self.collision():
+                                self.tetromino.y -= 1
+                                self.place_tetromino()
+                                self.tetromino = None
+                                self.break_lines()
+                        elif event.key == pygame.K_LEFT:
+                            self.tetromino.x -= 1
+                            if self.collision():
+                                self.tetromino.x += 1
+                        elif event.key == pygame.K_RIGHT:
+                            self.tetromino.x += 1
+                            if self.collision():
+                                self.tetromino.x -= 1
+                        elif event.key == pygame.K_SPACE:
+                            while not self.collision():
+                                self.tetromino.y += 1
+                            self.tetromino.y -= 1
+                            self.place_tetromino()
+                            self.tetromino = None
+                            self.break_lines()
+                        elif event.key == pygame.K_c:
+                            self.spawn_tetromino()
                 elif event.type == STEP:
                     if not self.tetromino:
-                        # Generate a new tetromino
-                        self.tetromino = choice(self.tetrominos)
-                        self.tetromino = J()
+                        self.spawn_tetromino()
                     else:
-                        # Move the tetromino down
                         self.tetromino.y += 1
+                        if self.collision():
+                            self.tetromino.y -= 1
+                            self.place_tetromino()
+                            self.tetromino = None
+                            self.break_lines()
 
-                # Draw playfield
-                self.draw_playfield()
+            # Draw playfield
+            self.draw_playfield()
 
-                # Draw falling tetromino
+            # Draw falling tetromino
+            if self.tetromino:
                 self.draw_falling()
 
-                # Update screen
-                pygame.display.flip()
+            self.display_score()
+
+            # Update screen
+            pygame.display.flip()
+
+    def collision(self):
+        t = self.tetromino
+        shape = t.rotations[t.rotation]
+        offset_x, offset_y = t.offsets[t.offset]
+        y = t.y + offset_y
+        x = t.x + offset_x
+        for r, row in enumerate(shape):
+            for c, block in enumerate(row):
+                if block:
+                    # Collision with other tetromino
+                    if (y + r < GRID_HEIGHT and x + c < GRID_WIDTH) and self.grid[
+                        y + r
+                    ][x + c] != 0:
+                        return True
+                    # OOB left OR right
+                    if x + c < 0 or x + c >= GRID_WIDTH:
+                        return True
+                    # OOB floor
+                    if y + r >= GRID_HEIGHT:
+                        return True
+        return False
+
+    def place_tetromino(self):
+        t = self.tetromino
+        offset_x, offset_y = t.offsets[t.offset]
+        shape = t.rotations[t.rotation]
+        y = t.y + offset_y
+        x = t.x + offset_x
+        for r, row in enumerate(shape):
+            for c, block in enumerate(row):
+                if block:
+                    self.grid[y + r][x + c] = t.type
+
+    def break_lines(self):
+        lines_cleared = sum(1 for row in self.grid[::-1] if 0 not in row)
+        if lines_cleared:
+            self.score += {1: 100, 2: 300, 3: 500, 4: 800}[lines_cleared]
+            self.grid = [[0] * GRID_WIDTH for _ in range(lines_cleared)] + self.grid[
+                : GRID_HEIGHT - lines_cleared
+            ]
 
     def draw_playfield(self):
         # Background
@@ -101,6 +171,20 @@ class Tetris:
 
     def draw_block(self, block, position):
         self.screen.blit(block, position)
+
+    def spawn_tetromino(self):
+        self.tetromino = choice([I(), O(), T(), S(), Z(), J(), L()])
+        self.draw_falling()
+        pygame.display.flip()
+        if self.collision():
+            self.tetromino = None
+            self.game_over()
+            pygame.time.wait(500)
+            exit(0)
+
+    def game_over(self):
+        # Do something
+        pass
 
     def print_grid(self):
         """For debugging only"""
