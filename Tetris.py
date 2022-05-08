@@ -12,6 +12,8 @@ class Tetris:
         self.lines = 0
         self._init_pygame()
         self.grid = [[0] * GRID_WIDTH for _ in range(GRID_HEIGHT)]
+        self.tetromino = None
+        self.next = None
 
     def _init_pygame(self):
         pygame.init()
@@ -20,7 +22,7 @@ class Tetris:
         self.screen = pygame.display.set_mode((SCREEN_WIDTH + 300, SCREEN_HEIGHT))
 
     def run(self):
-        SOUND_TETRIS_THEME.play(-1).set_volume(0.5)
+        SOUND_TETRIS_THEME.play(-1).set_volume(0.1)
         self._spawn_tetromino()
         while True:
             self._handle_events()
@@ -61,7 +63,7 @@ class Tetris:
                         SOUND_WHOOSH.play()
                     elif event.key == pygame.K_c:
                         self._spawn_tetromino()
-                        SOUND_BLOCK_SWAP.play()
+                        SOUND_BLOCK_SWAP.play().set_volume(0.2)
             elif event.type == STEP:
                 # Triggers every 500ms
                 if not self.tetromino:
@@ -80,6 +82,7 @@ class Tetris:
         self._draw_playfield()
         if self.tetromino:
             self._draw_falling()
+        self._draw_next()
         pygame.display.flip()
 
     def _collision(self):
@@ -190,13 +193,35 @@ class Tetris:
     def _draw_block(self, block, position):
         self.screen.blit(block, position)
 
+    def _draw_next(self):
+        NEXT_TEXT = FONT_MAIN.render(f"NEXT", True, (255, 255, 255))
+        SHAPE = SHAPES[self.next.type]
+        self.screen.blit(
+            NEXT_TEXT,
+            (
+                SCREEN_WIDTH + 150 - NEXT_TEXT.get_width() // 2,
+                SCREEN_HEIGHT // 2 - SHAPE.get_height() + 50,
+            ),
+        )
+        self.screen.blit(
+            SHAPE,
+            (
+                SCREEN_WIDTH + 150 - SHAPE.get_width() // 2,
+                SCREEN_HEIGHT // 2 - SHAPE.get_height() // 2 + 60,
+            ),
+        )
+
     def _spawn_tetromino(self):
-        self.tetromino = choice([I(), O(), T(), S(), Z(), J(), L()])
+        if not self.next:
+            self.next = choice([I(), O(), T(), S(), Z(), J(), L()])
+        self.tetromino = self.next
+        self.next = choice([I(), O(), T(), S(), Z(), J(), L()])
         self._draw_falling()
         pygame.display.flip()
         if self._collision():
             self.tetromino = None
             pygame.time.wait(500)
+            # self._game_over()
             exit(0)
 
     def _print_grid(self):

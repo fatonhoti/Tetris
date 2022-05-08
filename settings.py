@@ -36,6 +36,16 @@ BLOCKS = {
     0: image.load("./assets/tiles/tile_empty.png"),
 }
 
+SHAPES = {
+    "I": image.load("./assets/shapes/shape_i.png"),
+    "O": image.load("./assets/shapes/shape_o.png"),
+    "T": image.load("./assets/shapes/shape_t.png"),
+    "S": image.load("./assets/shapes/shape_s.png"),
+    "Z": image.load("./assets/shapes/shape_z.png"),
+    "J": image.load("./assets/shapes/shape_j.png"),
+    "L": image.load("./assets/shapes/shape_l.png"),
+}
+
 
 GRID_HEIGHT = 22
 GRID_WIDTH = 10
