@@ -15,6 +15,7 @@ class Tetris:
         self.grid = [[0] * GRID_WIDTH for _ in range(GRID_HEIGHT)]
         self.tetromino = None
         self.next = None
+        self.music = True
 
     def _init_pygame(self):
         pygame.init()
@@ -23,7 +24,8 @@ class Tetris:
         self.screen = pygame.display.set_mode((SCREEN_WIDTH + 300, SCREEN_HEIGHT))
 
     def run(self):
-        SOUND_TETRIS_THEME.play(-1).set_volume(0.1)
+        if self.music:
+            SOUND_TETRIS_THEME.play(-1).set_volume(0.1)
         self._spawn_tetromino()
         while True:
             self._handle_events()
@@ -65,6 +67,13 @@ class Tetris:
                     elif event.key == pygame.K_c:
                         self._spawn_tetromino()
                         SOUND_BLOCK_SWAP.play().set_volume(0.2)
+                    elif event.key == pygame.K_m:
+                        if self.music:
+                            self.music = False
+                            SOUND_TETRIS_THEME.stop()
+                        else:
+                            self.music = True
+                            SOUND_TETRIS_THEME.play(-1).set_volume(0.1)
             elif event.type == STEP:
                 # Triggers every 500ms
                 if not self.tetromino:
@@ -162,6 +171,7 @@ class Tetris:
         self.screen.blit(CONTROLS_RIGHT, (SCREEN_WIDTH + 10, 160))
         self.screen.blit(CONTROLS_SPACE, (SCREEN_WIDTH + 10, 190))
         self.screen.blit(CONTROLS_C, (SCREEN_WIDTH + 10, 220))
+        self.screen.blit(MUTE_TEXT, (SCREEN_WIDTH + 10, 260))
 
     def _draw_playfield(self):
         # Background
@@ -209,7 +219,7 @@ class Tetris:
             SHAPE,
             (
                 SCREEN_WIDTH + 150 - SHAPE.get_width() // 2,
-                SCREEN_HEIGHT // 2 - SHAPE.get_height() // 2 + 60,
+                SCREEN_HEIGHT // 2 - SHAPE.get_height() // 2 + 80,
             ),
         )
 

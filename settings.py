@@ -12,7 +12,8 @@ CONTROLS_UP = FONT_MAIN.render("UP:   ROTATE", True, (255, 255, 255))
 CONTROLS_LEFT = FONT_MAIN.render("LEFT:   MOVE LEFT", True, (255, 255, 255))
 CONTROLS_RIGHT = FONT_MAIN.render("RIGHT:   MOVE RIGHT", True, (255, 255, 255))
 CONTROLS_SPACE = FONT_MAIN.render("SPACE:   DROP", True, (255, 255, 255))
-CONTROLS_C = FONT_MAIN.render("C:   New Tetromino", True, (255, 255, 255))
+CONTROLS_C = FONT_MAIN.render("C:   Next Tetromino", True, (255, 255, 255))
+MUTE_TEXT = FONT_MAIN.render("M: Stop/start music", True, (255, 255, 255))
 
 # Sound effects
 mixer.init()
