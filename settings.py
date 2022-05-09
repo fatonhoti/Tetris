@@ -33,6 +33,7 @@ BLOCKS = {
     "Z": image.load("./assets/tiles/tile_orange.png"),
     "J": image.load("./assets/tiles/tile_turquoise.png"),
     "L": image.load("./assets/tiles/tile_yellow.png"),
+    "GHOST": image.load("./assets/tiles/tile_ghost.png"),
     0: image.load("./assets/tiles/tile_empty.png"),
 }
 

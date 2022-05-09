@@ -1,3 +1,4 @@
+from copy import deepcopy
 from random import choice
 
 import pygame
@@ -38,9 +39,9 @@ class Tetris:
                 if self.tetromino:
                     if event.key == pygame.K_UP:
                         self.tetromino.rotate()
-                        SOUND_ROTATE.play()
                         if self._collision():
                             self.tetromino.rotate(reverse=True)
+                        SOUND_ROTATE.play()
                     elif event.key == pygame.K_DOWN:
                         self.tetromino.y += 1
                         if self._collision():
@@ -82,6 +83,7 @@ class Tetris:
         self._draw_playfield()
         if self.tetromino:
             self._draw_falling()
+            self._draw_ghost()
         self._draw_next()
         pygame.display.flip()
 
@@ -210,6 +212,26 @@ class Tetris:
                 SCREEN_HEIGHT // 2 - SHAPE.get_height() // 2 + 60,
             ),
         )
+
+    def _draw_ghost(self):
+        original = deepcopy(self.tetromino)
+        # Move ghost down until it collides
+        while not self._collision():
+            self.tetromino.y += 1
+        self.tetromino.y -= 1
+        # Draw ghost
+        offset_x, offset_y = self.tetromino.offsets[self.tetromino.offset]
+        for r, row in enumerate(self.tetromino.rotations[self.tetromino.rotation]):
+            for c, block in enumerate(row):
+                if block:
+                    self._draw_block(
+                        BLOCKS["GHOST"],
+                        (
+                            (self.tetromino.x + c + offset_x) * BLOCK_WIDTH,
+                            (self.tetromino.y + r + offset_y) * BLOCK_HEIGHT,
+                        ),
+                    )
+        self.tetromino = original
 
     def _spawn_tetromino(self):
         if not self.next:
