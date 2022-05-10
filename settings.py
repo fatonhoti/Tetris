@@ -6,12 +6,13 @@ STEP = USEREVENT
 
 # Font
 font.init()
-FONT_MAIN = font.Font("./assets/fonts/Blockletter.otf", 30)
+FONT_MAIN = font.Font("./assets/fonts/Blockletter.otf", 28)
 TETRIS_TEXT = FONT_MAIN.render("TETRIS", True, (255, 255, 255))
-CONTROLS_UP = FONT_MAIN.render("UP:   ROTATE", True, (255, 255, 255))
+CONTROLS_UP = FONT_MAIN.render("UP:   ROTATE (clockwise)", True, (255, 255, 255))
 CONTROLS_LEFT = FONT_MAIN.render("LEFT:   MOVE LEFT", True, (255, 255, 255))
 CONTROLS_RIGHT = FONT_MAIN.render("RIGHT:   MOVE RIGHT", True, (255, 255, 255))
 CONTROLS_SPACE = FONT_MAIN.render("SPACE:   DROP", True, (255, 255, 255))
+CONTROLS_LCTRL = FONT_MAIN.render("LCTRL:   ROTATE (reverse)", True, (255, 255, 255))
 CONTROLS_C = FONT_MAIN.render("C:   Next Tetromino", True, (255, 255, 255))
 MUTE_TEXT = FONT_MAIN.render("M: Stop/start music", True, (255, 255, 255))
 

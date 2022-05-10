@@ -9,17 +9,18 @@ from Tetromino import *
 
 class Tetris:
     def __init__(self):
+        self.grid = [[0] * GRID_WIDTH for _ in range(GRID_HEIGHT)]
         self.score = 0
         self.lines = 0
-        self._init_pygame()
-        self.grid = [[0] * GRID_WIDTH for _ in range(GRID_HEIGHT)]
         self.tetromino = None
         self.next = None
         self.music = True
+        self.game_speed = 500 # ms
+        self._init_pygame()
 
     def _init_pygame(self):
         pygame.init()
-        pygame.time.set_timer(STEP, 500)
+        pygame.time.set_timer(STEP, self.game_speed)
         pygame.display.set_caption("TETRIS - Faton Hoti")
         self.screen = pygame.display.set_mode((SCREEN_WIDTH + 300, SCREEN_HEIGHT))
 
@@ -64,6 +65,11 @@ class Tetris:
                         self._place_tetromino()
                         SOUND_BLOCK_DROP.play()
                         SOUND_WHOOSH.play()
+                    elif event.key == pygame.K_LCTRL:
+                        self.tetromino.rotate(reverse=True)
+                        if self._collision():
+                            self.tetromino.rotate()
+                        SOUND_ROTATE.play()
                     elif event.key == pygame.K_c:
                         self._spawn_tetromino()
                         SOUND_BLOCK_SWAP.play().set_volume(0.2)
@@ -91,8 +97,8 @@ class Tetris:
         self._draw_side_panel()
         self._draw_playfield()
         if self.tetromino:
-            self._draw_falling()
             self._draw_ghost()
+            self._draw_falling()
         self._draw_next()
         pygame.display.flip()
 
@@ -150,6 +156,9 @@ class Tetris:
                 lines_cleared, 1000
             ) * lines_cleared
             self.lines += lines_cleared
+        if lines_cleared > 0 and lines_cleared % 10 == 0 and self.game_speed > 105:
+            # Speed up the game by 2ms every 10 lines cleared, minimum speed is 105ms
+            self._speed_up()
 
     def _draw_side_panel(self):
         pygame.draw.rect(self.screen, (0, 0, 0), (SCREEN_WIDTH, 0, 300, SCREEN_HEIGHT))
@@ -170,8 +179,9 @@ class Tetris:
         self.screen.blit(CONTROLS_LEFT, (SCREEN_WIDTH + 10, 130))
         self.screen.blit(CONTROLS_RIGHT, (SCREEN_WIDTH + 10, 160))
         self.screen.blit(CONTROLS_SPACE, (SCREEN_WIDTH + 10, 190))
-        self.screen.blit(CONTROLS_C, (SCREEN_WIDTH + 10, 220))
-        self.screen.blit(MUTE_TEXT, (SCREEN_WIDTH + 10, 260))
+        self.screen.blit(CONTROLS_LCTRL, (SCREEN_WIDTH + 10, 220))
+        self.screen.blit(CONTROLS_C, (SCREEN_WIDTH + 10, 250))
+        self.screen.blit(MUTE_TEXT, (SCREEN_WIDTH + 10, 280))
 
     def _draw_playfield(self):
         # Background
@@ -212,14 +222,14 @@ class Tetris:
             NEXT_TEXT,
             (
                 SCREEN_WIDTH + 150 - NEXT_TEXT.get_width() // 2,
-                SCREEN_HEIGHT // 2 - SHAPE.get_height() + 50,
+                SCREEN_HEIGHT // 2 - SHAPE.get_height() + 80,
             ),
         )
         self.screen.blit(
             SHAPE,
             (
                 SCREEN_WIDTH + 150 - SHAPE.get_width() // 2,
-                SCREEN_HEIGHT // 2 - SHAPE.get_height() // 2 + 80,
+                SCREEN_HEIGHT // 2 - SHAPE.get_height() // 2 + 130,
             ),
         )
 
@@ -255,6 +265,10 @@ class Tetris:
             pygame.time.wait(500)
             # self._game_over()
             exit(0)
+    
+    def _speed_up(self):
+        self.game_speed -= 25 # decrease game speed by 10 ms
+        pygame.time.set_timer(STEP, self.game_speed)
 
     def _print_grid(self):
         """For debugging only"""
